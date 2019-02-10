@@ -15,7 +15,9 @@ let jstex = (function(){
     let rstr = Object.keys(mapsym).reduce((acc, x) => acc + x + "|", "\\\\(").slice(0, -1) + ")";
     let regex = new RegExp(rstr, 'g');
     let map = m => { return mapsym[m.slice(1)]; };
-    return text => {
-        return escapeHtml(text).replace(regex, map);
+    return (text, htmlescape) => {
+        if (htmlescape)
+            text = escapeHtml(text);
+        return text.replace(regex, map);
     };
 })();
