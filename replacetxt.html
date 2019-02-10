@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8">
+        <title>JSTex Demonstrator</title>
+    </head>
+
+    <body>
+        <textarea id="mytextinput" rows="20" cols="80"></textarea>
+        <div id="output"></div>
+        <script type="text/javascript" src="texmath.js"></script>
+        <script type="text/javascript" src="jstex.js"></script>
+        <script type="text/javascript">
+            let out = document.getElementById("output");
+            let ti = document.getElementById("mytextinput");
+            ti.addEventListener("keyup", e => {
+                // clear output
+                while (out.firstChild) out.removeChild(out.firstChild);
+                ti.value.split('\n')
+                    .map(jstex)
+                    .reduce((acc, x) => {
+                        s = document.createElement("span");
+                        s.appendChild(document.createTextNode(x));
+                        acc.appendChild(s);
+                        acc.appendChild(document.createElement("br"));
+                        return acc;
+                    }, out);
+            });
+        </script>
+    </body>
+</html>
