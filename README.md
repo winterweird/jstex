@@ -15,8 +15,6 @@ for use in a web browser.
 <script type="text/javascript">
 let x = "string containing LaTeX math symbols such as \\Sigma or \\varepsilon";
 let output = jstex(x);
-// NOTE: output contains escaped html special chars, so it can be used as
-// innerHTML without problems
 
 let s = document.createElement("span");
 s.appendChild(document.createTextNode(output));
@@ -35,6 +33,8 @@ LaTeX math symbol codes (such as `"pi"`) to the corresponding unicode character
 (such as `"\u{003C0}"`). The file `jstex.js` contains a function `jstex(text)`
 which takes a regex selecting any of the keys `k` in `mapsym` and replaces the
 occurrences of `\k` in `text` with the corresponding unicode character `mapsym[k]`.
+In order to ensure that the longest possible substring is always matched, keys
+are sorted by length before the regex is constructed.
 
 This isn't specific to the math symbols in LaTeX - the only thing which is LaTeX
 specific is the preceding backslash - but with a different `mapsym` it could
@@ -50,6 +50,51 @@ grep unicode-math-table.tex -e UnicodeMathSymbol | sed -n 's/\\UnicodeMathSymbol
 Notice the `\(mup\)\?` part of the `sed` expression, which removes the preceding
 "mup" in front of the Greek letters so that the familiar LaTeX math commands can
 be used.
+
+For convenience, `jstex.js` also contains regexes `regtexc` and `regtexnc`,
+which are regexes that match any LaTeX command, but either capture or do not
+capture the command, respectively.
+
+## Italicization
+
+The following function may be helpful if you wish to give sections of the text a
+similar styling from what you get using LaTeX's `$` math section:
+
+```js
+function italicize_latex(text) {
+    let concat = (acc, x) => acc+x;
+    let inMathSection = false;
+    return text.split('$').map(xs => {
+        if (inMathSection) {
+            let backslash = false;
+            xs = xs.split(regtexc).map(x => {
+                if (!backslash) {
+                    x = x.split('')
+                         .map(ch => mapsym.hasOwnProperty('mit'+ch) ? ' \\mit'+ ch + ' ' : ch)
+                         .reduce(concat, '');
+                }
+                else {
+                    x = '\\' + x; // reinsert backslash
+                }
+                backslash = !backslash;
+                return x;
+            }).reduce(concat, '');
+        }
+        inMathSection = !inMathSection;
+        return xs;
+    }).reduce(concat, '');
+}
+```
+
+This function will, for all sections enclosed in `$` signs, replace all
+characters which have an italic version with the LaTeX command for the italic
+version of that character if they are not part of something already recognized
+as a LaTeX command. It will also pad such characters with surrounding spaces,
+which in HTML will be compressed down to a single visible space, giving it a
+slightly more spaced-out look than it would otherwise get.
+
+Due to `mith` not existing in the list of LaTeX math symbols, [the Unicode code
+point for the Planck constant](http://www.fileformat.info/info/unicode/char/210E/index.htm) was added instead.
 
 ## Limitations
 
