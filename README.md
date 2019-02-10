@@ -6,6 +6,8 @@ Essentially it's a replacement engine that maps substrings such as `\pi` or
 `\cdot` (that is, LaTeX math symbols) into the corresponding Unicode characters
 for use in a web browser.
 
+A working demonstrator can be found [here](https://vegarditland.com/jstex).
+
 ## Example usage
 
 ```html
