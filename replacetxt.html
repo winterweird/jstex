@@ -11,12 +11,36 @@
         <script type="text/javascript" src="texmath.js"></script>
         <script type="text/javascript" src="jstex.js"></script>
         <script type="text/javascript">
+            function italicize_latex(text) {
+                let concat = (acc, x) => acc+x;
+                let inMathSection = false;
+                return text.split('$').map(xs => {
+                    if (inMathSection) {
+                        let backslash = false;
+                        xs = xs.split(regtexc).map(x => {
+                            if (!backslash) {
+                                x = x.split('')
+                                     .map(ch => mapsym.hasOwnProperty('mit'+ch) ?  ' \\mit'+ch + ' ' : ch)
+                                     .reduce(concat, '');
+                            }
+                            else {
+                                x = '\\' + x; // reinsert backslash
+                            }
+                            backslash = !backslash;
+                            return x;
+                        }).reduce(concat, '');
+                    }
+                    inMathSection = !inMathSection;
+                    return xs;
+                }).reduce(concat, '');
+            }
             let out = document.getElementById("output");
             let ti = document.getElementById("mytextinput");
             ti.addEventListener("keyup", e => {
                 // clear output
                 while (out.firstChild) out.removeChild(out.firstChild);
                 ti.value.split('\n')
+                    .map(italicize_latex)
                     .map(jstex)
                     .reduce((acc, x) => {
                         s = document.createElement("span");
