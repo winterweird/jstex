@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8">
+        <title>JSTex test</title>
+    </head>
+
+    <body>
+        <input type="text" id="mytextinput" /><br>
+        <span id="output"></span>
+        <script type="text/javascript" src="texmath.js"></script>
+        <script type="text/javascript" src="jstex.js"></script>
+        <script type="text/javascript">
+            let ti = document.getElementById("mytextinput");
+            ti.addEventListener("keyup", e => {
+                document.getElementById("output").innerHTML = jstex(ti.value);
+            });
+        </script>
+    </body>
+</html>
