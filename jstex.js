@@ -11,12 +11,11 @@ let jstex = (function(){
 
         return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     };
-    let texmap = texmath();
+    
+    let rstr = Object.keys(mapsym).reduce((acc, x) => acc + x + "|", "\\\\(").slice(0, -1) + ")";
+    let regex = new RegExp(rstr, 'g');
+    let map = m => { return mapsym[m.slice(1)]; };
     return text => {
-        let rstr = Object.keys(texmap).reduce((acc, x) => acc + x + "|", "\\\\(").slice(0, -1) + ")";
-        
-        let regex = new RegExp(rstr, 'g');
-
-        return escapeHtml(text).replace(regex, m => { return texmap[m.slice(1)]; });
+        return escapeHtml(text).replace(regex, map);
     };
-});
+})();
